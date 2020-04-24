@@ -16,9 +16,9 @@ from .Connect4NNet import Connect4NNet as onnet
 args = dotdict({
     'lr': 0.001,
     'dropout': 0.3,
-    'epochs': 10,
-    'batch_size': 64,
-    'num_channels': 512,
+    'epochs': 20,
+    'batch_size': 32,
+    'num_channels': 32,
 })
 
 
