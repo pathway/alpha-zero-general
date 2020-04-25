@@ -12,7 +12,7 @@ human_vs_cpu = True #False # True
 g = Connect4Game(6,7,4)
 
 n1 = NNet(g)
-n1.load_checkpoint('./temp/','best.pth.tar')
+n1.load_checkpoint('./submit_models/','best.pth.tar')
 args1 = dotdict({'numMCTSSims': 50, 'cpuct':2.0})
 mcts1 = MCTS(g, n1, args1)
 n1p = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
@@ -37,12 +37,12 @@ def my_agent(observation, configuration):
 
     valids = np.where( g.getValidMoves(g.getCanonicalForm(obs_board, curPlayer), 1) , 1.0, 0.0)
     action_probs = mcts1.getActionProb(can_board, temp=0)
-    print(action_probs)
+    #print(action_probs)
     action_probs *= valids
     action = np.argmax(action_probs)
 
-    print("valids",valids)
-    print(type(action))
+    #print("valids",valids)
+    #print(type(action))
     return int(action)
 
 
@@ -91,6 +91,5 @@ def eval_agent():
     #rewards = evaluate("connectx", agents, env.configuration, steps, num_episodes,)
     #print(rewards)
 
-#try_agent()
-
-eval_agent()
+try_agent()
+#eval_agent()
