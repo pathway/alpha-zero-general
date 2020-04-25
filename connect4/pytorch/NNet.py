@@ -1,4 +1,3 @@
-import argparse
 import os
 import shutil
 import time
@@ -11,24 +10,24 @@ from utils import *
 from pytorch_classification.utils import Bar, AverageMeter
 from NeuralNet import NeuralNet
 
-import argparse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
 
-from .OthelloNNet import OthelloNNet as onnet
+from .Connect4NNet import Connect4NNet as onnet
 
 args = dotdict({
     'lr': 0.001,
-    'cuda' : True,
-    'dropout': 0.3,
-    'epochs': 10,
-    'batch_size': 64,
-    'cuda': torch.cuda.is_available(),
-    'num_channels': 512,
+    'dropout': 0.2,
+    'cuda':True,
+    'epochs': 20,
+    'batch_size': 32,
+    'num_channels': 12,
 })
+
+
+## Code based on othello.NNetWrapper with minimal changes.
 
 class NNetWrapper(NeuralNet):
     def __init__(self, game):
@@ -46,7 +45,7 @@ class NNetWrapper(NeuralNet):
         optimizer = optim.Adam(self.nnet.parameters())
 
         for epoch in range(args.epochs):
-            print('EPOCH ::: ' + str(epoch+1))
+            print('EPOCH ::: ' + str(epoch + 1))
             self.nnet.train()
             data_time = AverageMeter()
             batch_time = AverageMeter()
@@ -54,17 +53,18 @@ class NNetWrapper(NeuralNet):
             v_losses = AverageMeter()
             end = time.time()
 
-            bar = Bar('Training Net', max=int(len(examples)/args.batch_size))
+            bar = Bar('Training Net', max=int(len(examples) / args.batch_size))
             batch_idx = 0
 
-            while batch_idx < int(len(examples)/args.batch_size):
+            # self.sess.run(tf.local_variables_initializer())
+            while batch_idx < int(len(examples) / args.batch_size):
                 sample_ids = np.random.randint(len(examples), size=args.batch_size)
                 boards, pis, vs = list(zip(*[examples[i] for i in sample_ids]))
+
                 boards = torch.FloatTensor(np.array(boards).astype(np.float64))
                 target_pis = torch.FloatTensor(np.array(pis))
                 target_vs = torch.FloatTensor(np.array(vs).astype(np.float64))
 
-                # predict
                 if args.cuda:
                     boards, target_pis, target_vs = boards.contiguous().cuda(), target_pis.contiguous().cuda(), target_vs.contiguous().cuda()
 
@@ -94,7 +94,7 @@ class NNetWrapper(NeuralNet):
                 # plot progress
                 bar.suffix  = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} | Loss_pi: {lpi:.4f} | Loss_v: {lv:.3f}'.format(
                             batch=batch_idx,
-                            size=int(len(examples)/args.batch_size),
+                            size=int(len(examples) / args.batch_size),
                             data=data_time.avg,
                             bt=batch_time.avg,
                             total=bar.elapsed_td,
@@ -129,6 +129,7 @@ class NNetWrapper(NeuralNet):
 
     def loss_v(self, targets, outputs):
         return torch.sum((targets-outputs.view(-1))**2)/targets.size()[0]
+
 
     def save_checkpoint(self, folder='checkpoint', filename='checkpoint.pth.tar'):
         filepath = os.path.join(folder, filename)

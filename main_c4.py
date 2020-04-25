@@ -1,6 +1,6 @@
 from Coach import Coach
 from connect4.Connect4Game import Connect4Game as Game
-from connect4.tensorflow.NNet import NNetWrapper as nn
+from connect4.pytorch.NNet import NNetWrapper as nn
 
 #from othello.OthelloGame import OthelloGame as Game
 #from othello.pytorch.NNet import NNetWrapper as nn
@@ -8,14 +8,14 @@ from connect4.tensorflow.NNet import NNetWrapper as nn
 from utils import *
 
 args = dotdict({
-    'numIters': 100, #10, # 1000,
+    'numIters': 20, #10, # 1000,
     'numEps':  100, # 100,              # Number of complete self-play games to simulate during a new iteration.
     'tempThreshold': 15,        #
     'updateThreshold': 0.6,     # During arena playoff, new neural net will be accepted if threshold or more of games are won.
     'maxlenOfQueue': 200000,    # Number of game examples to train the neural networks.
-    'numMCTSSims':  12, # 25,          # Number of games moves for MCTS to simulate.
+    'numMCTSSims':  20, #50, # 25,          # Number of games moves for MCTS to simulate.
     'arenaCompare': 40,         # Number of games to play during arena play to determine if new net will be accepted.
-    'cpuct': 1,
+    'cpuct': 2.0,
 
     'checkpoint': './temp/',
     'load_model': False,
@@ -26,7 +26,7 @@ args = dotdict({
 })
 
 if __name__ == "__main__":
-    #g = Game(6,7,4) # connect 4
+    #g = Game(5,5,3) # mini
     g = Game(6,7,4)
     nnet = nn(g)
 

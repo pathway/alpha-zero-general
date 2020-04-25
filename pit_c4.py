@@ -2,7 +2,7 @@ import Arena
 from MCTS import MCTS
 from connect4.Connect4Game import Connect4Game
 from connect4.Connect4Players import *
-from connect4.tensorflow.NNet import NNetWrapper as NNet
+from connect4.pytorch.NNet import NNetWrapper as NNet
 
 
 import numpy as np
@@ -13,9 +13,10 @@ use this script to play any two agents against each other, or play manually with
 any agent.
 """
 
-human_vs_cpu = False # True
+human_vs_cpu = True #False # True
 
 g = Connect4Game(6,7,4)
+#g = Connect4Game(5,5,3) # mini
 
 # all players
 rp = RandomPlayer(g).play
@@ -27,7 +28,7 @@ if 1:
     # nnet players
     n1 = NNet(g)
     n1.load_checkpoint('./temp/','best.pth.tar')
-    args1 = dotdict({'numMCTSSims': 1, 'cpuct':1.0})
+    args1 = dotdict({'numMCTSSims': 300, 'cpuct':1.0})
     mcts1 = MCTS(g, n1, args1)
     n1p = lambda x: np.argmax(mcts1.getActionProb(x, temp=0))
     p1_name = 'az-1'
